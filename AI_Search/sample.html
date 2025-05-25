@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Azure Search Autocomplete</title>
+</head>
+<body>
+
+<input type="text" id="searchBox" placeholder="Start typing..." />
+<ul id="suggestions" style="list-style: none; padding-left: 0;"></ul>
+
+<script>
+   const apiKey = 'apikey';
+  const serviceName = 'aisearch';
+  const indexName = 'index';
+  const suggesterName = 'sg';  // Make sure this matches your suggester name in Azure Search
+
+  const searchBox = document.getElementById('searchBox');
+  const suggestionsList = document.getElementById('suggestions');
+
+  searchBox.addEventListener('input', async () => {
+    const query = searchBox.value.trim();
+    suggestionsList.innerHTML = ''; // clear previous suggestions
+
+    if (query.length === 0) return;
+
+      const url = `https://${serviceName}.search.windows.net/indexes/${indexName}/docs/suggest?api-version=2025-05-01-preview&search=${encodeURIComponent(query)}&suggesterName=${suggesterName}&fuzzy=true&$select=title,keywords`;
+
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'api-key': apiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        console.error('HTTP error', response.status, await response.text());
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.value && data.value.length > 0) {
+        data.value.forEach(item => {
+          const suggestionText = item.title || item.keywords || item.app_name || item['@search.text'];
+          const li = document.createElement('li');
+          li.textContent = suggestionText;
+          li.style.cursor = 'pointer';
+          li.style.padding = '4px 8px';
+
+          // Let user click to choose
+          li.addEventListener('click', () => {
+            searchBox.value = suggestionText;
+            suggestionsList.innerHTML = '';
+          });
+
+          suggestionsList.appendChild(li);
+        });
+      }
+    } catch (error) {
+      console.error('Autocomplete error:', error);
+    }
+  });
+</script>
+
+</body>
+</html>

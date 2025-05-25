@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot Popup</title>
+  <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+  <style>
+    #chat-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #0078D4;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 999;
+    }
+
+    #chat-popup {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 400px;
+      height: 500px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      z-index: 998;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<button id="chat-button">💬</button>
+<div id="chat-popup">
+  <div id="webchat" role="main" style="height: 100%; width: 100%;"></div>
+</div>
+
+<script>
+  const botSecret = 'mysecret'; // Replace with your Web Chat secret
+
+  document.getElementById('chat-button').addEventListener('click', () => {
+    const popup = document.getElementById('chat-popup');
+    popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+  });
+
+  window.WebChat.renderWebChat({
+    directLine: window.WebChat.createDirectLine({ secret: botSecret }),
+    styleOptions: {
+      botAvatarInitials: 'AI',
+      botAvatarImage: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg', // Replace with your avatar
+      userAvatarInitials: 'You',
+      userAvatarImage: ''
+    }
+  }, document.getElementById('webchat'));
+</script>
+
+</body>
+</html>
